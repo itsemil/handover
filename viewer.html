@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Handover Dashboard</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6;
+            padding: 20px; 
+            margin: 0;
+        }
+        .header-controls {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header-controls h1 { margin: 0; color: #0056b3; font-size: 24px; }
+        .date-filter { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;}
+        
+        #issuesContainer {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .issue-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .issue-header h3 { margin: 0; color: #333; }
+        .badge {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .evidence-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+        .no-data { text-align: center; color: #666; font-size: 18px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-controls">
+        <h1>Shift Handover Log</h1>
+        <div>
+            <label for="dateFilter"><strong>Filter by Date: </strong></label>
+            <input type="date" id="dateFilter" class="date-filter">
+            <button id="clearFilterBtn" style="padding: 8px; margin-left: 5px; cursor: pointer;">Clear</button>
+        </div>
+    </div>
+
+    <div id="issuesContainer">
+        <p class="no-data">Loading shift reports...</p>
+    </div>
+
+    <script type="module" src="viewer.js"></script>
+</body>
+</html>

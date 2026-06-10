@@ -6,11 +6,13 @@
     <title>Shift Handover & Issue Tracker</title>
     <style>
         :root {
-            --primary-color: #0056b3;
-            --bg-color: #f4f7f6;
-            --box-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #cccccc;
+            /* Dark Mode Variables */
+            --primary-color: #3b82f6; /* A slightly brighter blue for dark mode */
+            --bg-color: #121212;      /* Very dark gray/black background */
+            --box-bg: #1e1e1e;        /* Slightly lighter gray for the form box */
+            --text-color: #e0e0e0;    /* Light gray text to reduce eye strain */
+            --border-color: #333333;  /* Dark borders */
+            --input-bg: #2d2d2d;      /* Background for the text boxes and dropdowns */
         }
 
         body { 
@@ -27,7 +29,7 @@
             background-color: var(--box-bg);
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* Darker shadow */
             width: 100%;
             max-width: 500px;
         }
@@ -35,7 +37,7 @@
         h2 {
             margin-top: 0;
             color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
         }
 
@@ -52,15 +54,21 @@
         select, input[type="text"], input[type="password"], textarea { 
             width: 100%; 
             padding: 12px; 
+            background-color: var(--input-bg);
+            color: var(--text-color);
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            box-sizing: border-box; /* Ensures padding doesn't widen the box */
-            font-size: 16px; /* Prevents iOS auto-zoom on inputs */
+            box-sizing: border-box; 
+            font-size: 16px; 
         }
+
+        /* Changes the placeholder text color so it's readable but dim */
+        ::placeholder { color: #888888; }
 
         input[type="file"] {
             margin-top: 5px;
             font-size: 14px;
+            color: var(--text-color);
         }
 
         button { 
@@ -77,11 +85,12 @@
         }
 
         button:hover {
-            background-color: #004494;
+            background-color: #2563eb;
         }
 
         button:disabled {
-            background-color: #999999;
+            background-color: #555555;
+            color: #999999;
             cursor: not-allowed;
         }
     </style>

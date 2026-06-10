@@ -7,58 +7,96 @@
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f4f7f6;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
             padding: 20px; 
             margin: 0;
         }
+        
         .header-controls {
             max-width: 800px;
             margin: 0 auto 20px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
+            background: #1e1e1e; /* Darker header box */
             padding: 15px 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* Darker shadow */
+            border: 1px solid #333;
         }
-        .header-controls h1 { margin: 0; color: #0056b3; font-size: 24px; }
-        .date-filter { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;}
+        
+        .header-controls h1 { margin: 0; color: #3b82f6; font-size: 24px; }
+        
+        .date-filter { 
+            padding: 8px; 
+            border-radius: 4px; 
+            border: 1px solid #444; 
+            font-size: 16px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        /* Ensures the calendar icon shows up clearly in Chrome/Edge */
+        ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        #clearFilterBtn {
+            padding: 8px 12px;
+            margin-left: 5px;
+            cursor: pointer;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        #clearFilterBtn:hover { background-color: #2563eb; }
         
         #issuesContainer {
             max-width: 800px;
             margin: 0 auto;
         }
+        
         .issue-card {
-            background: white;
+            background: #1e1e1e; /* Dark card background */
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
             margin-bottom: 20px;
+            border: 1px solid #333;
         }
+        
         .issue-header {
             display: flex;
             justify-content: space-between;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid #333; /* Darker dividing line */
             padding-bottom: 10px;
             margin-bottom: 15px;
         }
-        .issue-header h3 { margin: 0; color: #333; }
+        
+        .issue-header h3 { margin: 0; color: #ffffff; }
+        
         .badge {
-            background: #e9ecef;
+            background: #333333; /* Darker badge */
+            color: #e0e0e0;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 14px;
             font-weight: bold;
         }
+        
         .evidence-img {
             max-width: 100%;
             height: auto;
             border-radius: 4px;
             margin-top: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid #444;
         }
-        .no-data { text-align: center; color: #666; font-size: 18px; margin-top: 40px; }
+        
+        .no-data { text-align: center; color: #aaaaaa; font-size: 18px; margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -68,7 +106,7 @@
         <div>
             <label for="dateFilter"><strong>Filter by Date: </strong></label>
             <input type="date" id="dateFilter" class="date-filter">
-            <button id="clearFilterBtn" style="padding: 8px; margin-left: 5px; cursor: pointer;">Clear</button>
+            <button id="clearFilterBtn">Clear</button>
         </div>
     </div>
 

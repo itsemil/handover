@@ -1,12 +1,7 @@
-// Import the core Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-
-// Import the specific services we are using
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
-// Your specific web app's Firebase configuration
+// 1. Firebase Config (Text Database Only)
 const firebaseConfig = {
     apiKey: "AIzaSyDAH4_75qX-4YSUP9pFnEhekTpCFxzgDnY",
     authDomain: "shift-handover-df4d8.firebaseapp.com",
@@ -16,95 +11,104 @@ const firebaseConfig = {
     appId: "1:680824877405:web:bd0ebe102ce147080938b4"
 };
 
-// Initialize Firebase and the services
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
+
+// 2. Cloudinary Credentials (REPLACE THESE WITH YOUR DETAILS)
+const CLOUDINARY_CLOUD_NAME = "ml_default"; 
+const CLOUDINARY_UPLOAD_PRESET = "YOUR_UNSIGNED_UPLOAD_PRESET_NAME";
+
+// Simple local operator credentials
+const users = {
+    "jsmith": "1234",
+    "mbrookes": "5678",
+    "asupervisor": "0000" 
+};
+
+let currentLoggedInUser = "";
 
 // DOM Elements
 const loginSection = document.getElementById('loginSection');
 const dashboardSection = document.getElementById('dashboardSection');
-let currentUser = null;
+const usernameInput = document.getElementById('usernameInput');
+const pinInput = document.getElementById('pinInput');
+const loginBtn = document.getElementById('loginBtn');
+const submitBtn = document.getElementById('submitBtn');
 
-// --- Login Logic ---
-document.getElementById('loginBtn').addEventListener('click', async () => {
-    const username = document.getElementById('usernameInput').value.trim();
-    const pin = document.getElementById('pinInput').value;
-    
-    // Append the dummy domain to bypass Firebase's email requirement
-    const dummyEmail = `${username}@factory.local`;
+// Login Event
+loginBtn.addEventListener('click', () => {
+    const user = usernameInput.value.trim();
+    const pin = pinInput.value.trim();
 
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, dummyEmail, pin);
-        currentUser = userCredential.user;
-        
-        // Hide login, show dashboard
+    if (users[user] && users[user] === pin) {
+        currentLoggedInUser = user;
         loginSection.classList.add('hidden');
         dashboardSection.classList.remove('hidden');
-    } catch (error) {
-        alert("Invalid Username or PIN");
-        console.error("Login Error:", error);
+    } else {
+        alert("Invalid Username or PIN!");
     }
 });
 
-// --- Submit Logic ---
-document.getElementById('submitBtn').addEventListener('click', async () => {
+// Report Submission Event
+submitBtn.addEventListener('click', async () => {
     const shift = document.getElementById('shiftSelect').value;
     const area = document.getElementById('areaSelect').value;
-    const issue = document.getElementById('issueInput').value.trim();
+    const issueDetails = document.getElementById('issueInput').value.trim();
     const photoFile = document.getElementById('photoInput').files[0];
-    const username = document.getElementById('usernameInput').value.trim();
 
-    // Basic validation
-    if (!issue) {
-        alert("Please describe the issue before submitting.");
+    if (!area || !issueDetails) {
+        alert("Please select an Area and provide Issue Details.");
         return;
     }
 
-    // Change button text and disable it to prevent double submissions
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.innerText = "Uploading Evidence & Report...";
+    // Disable button to prevent double submissions
     submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
 
-    let photoUrl = "";
+    let finalPhotoUrl = ""; // Default empty string if no photo is uploaded
 
     try {
-        // 1. Upload Photo to Firebase Storage if one was attached
+        // If the operator attached a photo, upload it to Cloudinary first
         if (photoFile) {
-            // Create a unique filename using the current timestamp and original name
-            const storageRef = ref(storage, `evidence/${Date.now()}_${photoFile.name}`);
-            const snapshot = await uploadBytes(storageRef, photoFile);
-            photoUrl = await getDownloadURL(snapshot.ref);
+            const formData = new FormData();
+            formData.append('file', photoFile);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+            // Fetch request straight to Cloudinary's secure upload API
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to upload image to Cloudinary.");
+            }
+
+            const cloudinaryData = await response.json();
+            finalPhotoUrl = cloudinaryData.secure_url; // This is the live image URL link
         }
 
-        // 2. Save the Shift Report to Firestore Database
+        // Save everything into Firestore Database
         await addDoc(collection(db, "shift_reports"), {
-            reportedBy: username,
             shift: shift,
             area: area,
-            issueDetails: issue,
-            photoUrl: photoUrl,
-            status: "Open", // Default status for new issues
-            timestamp: serverTimestamp() // Uses Firebase server time for accurate sorting
+            issueDetails: issueDetails,
+            photoUrl: finalPhotoUrl, // Storing the Cloudinary text link here
+            reportedBy: currentLoggedInUser,
+            timestamp: serverTimestamp()
         });
 
-        alert("Shift report submitted successfully!");
+        alert("Report successfully submitted!");
         
-        // Reset the form fields for the next report
+        // Reset the form fields
         document.getElementById('issueInput').value = "";
         document.getElementById('photoInput').value = "";
-        
-        // Reset the button
-        submitBtn.innerText = "Submit Report";
-        submitBtn.disabled = false;
 
     } catch (error) {
-        console.error("Error submitting report: ", error);
-        alert("Failed to submit the report. Please check your connection and try again.");
-        
-        // Reset the button in case of failure so they can try again
-        submitBtn.innerText = "Submit Report";
+        console.error("Submission failed: ", error);
+        alert("Error submitting report. Please check your connections.");
+    } finally {
         submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Report";
     }
 });
